@@ -1,0 +1,9 @@
+<launch>
+  <node type="point_cloud2_assembler" pkg="laser_assembler"
+        name="my_assembler">
+    <remap from="cloud" to="/point_cloud/points"/>
+    <param name="max_clouds" type="int" value="400" />
+<!--     TODO change frame to base link -->
+<!--     <param name="fixed_frame" type="string" value="camera_link" /> -->
+  </node>
+</launch>

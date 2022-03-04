@@ -9,7 +9,7 @@ import sensor_msgs.msg
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
-
+# run v4l2-ctl --list-devices to determine index
 index_ir_cam = 0
 
 
@@ -60,11 +60,14 @@ class Capture:
                 break
 
             frame = cv2.resize(frame[:, :], (640, 480))
+
+            # uncomment the line below if you are capturing raw but want to send a visible image(usefull for debugging)
             # frame = Capture.raw_to_8bit(frame)
 
             try:
                 # use for color or grayscale
                 i_msg = self.bridge.cv2_to_imgmsg(frame,'bgr8')
+
                 # use for raw 16 bit format
                 # msg self.bridge.cv2_to_imgmsg(frame, 'mono16')
 
