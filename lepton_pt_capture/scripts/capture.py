@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import cv2
+import numpy as np
+
+import rospy
+import sensor_msgs.msg
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
+
+
+index_ir_cam = 0
+
+
+class Capture:
+
+    def __init__(self):
+        rospy.init_node('lepton_pt_capture', anonymous=True)
+        rospy.on_shutdown(self.shutdownhook)
+        self.img_pub = rospy.Publisher('ir_image', Image, queue_size=10)
+        self.bridge = CvBridge()
+        self.ir_cap = Capture.init_ir_cap()
+
+
+        rospy.loginfo('%s started' % rospy.get_name())
+
+    @staticmethod
+    def init_ir_cap():
+        # use V4l2 pipe otherwise CV2 returns 8bit image
+        cap_ir = cv2.VideoCapture(index_ir_cam, cv2.CAP_V4L2)
+        # raw format
+        # cap_ir.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y', '1', '6', ' '))
+        # colored format
+        cap_ir.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('B', 'G', 'R', '3'))
+        cap_ir.set(cv2.CAP_PROP_CONVERT_RGB, 0)
+        # force resolution otherwise weirdness happens (extra pixels)
+        cap_ir.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
+        cap_ir.set(cv2.CAP_PROP_FRAME_HEIGHT, 120)
+        cap_ir.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+
+        if not cap_ir.isOpened():
+            rospy.logerr("Cannot open ir camera")
+            exit()
+
+        return cap_ir
+
+    def shutdownhook(self):
+        self.ir_cap.release()
+        cv2.destroyAllWindows()
+
+    def capture(self):
+
+        while True:
+            # Capture frame-by-frame
+            code, frame = self.ir_cap.read()
+            # if frame is read correctly ret is True
+            if not code:
+                rospy.loginfo("Can't receive frame (stream end?). Exiting ...")
+                break
+
+            frame = cv2.resize(frame[:, :], (640, 480))
+            # frame = Capture.raw_to_8bit(frame)
+
+            try:
+                # use for color or grayscale
+                i_msg = self.bridge.cv2_to_imgmsg(frame,'bgr8')
+                # use for raw 16 bit format
+                # msg self.bridge.cv2_to_imgmsg(frame, 'mono16')
+
+                i_msg.header.stamp = rospy.rostime.Time.now()
+                i_msg.header.frame_id = 'camera_depth_optical_frame'
+                self.img_pub.publish(i_msg)
+
+            except CvBridgeError as e:
+                rospy.logerr(e)
+
+    def raw_to_8bit(data):
+        cv2.normalize(data, data, 0, 65535, cv2.NORM_MINMAX)
+        np.right_shift(data, 8, data)
+        return cv2.cvtColor(np.uint8(data), cv2.COLOR_GRAY2RGB)
+
+
+def main():
+    cap = Capture()
+    cap.capture()
+    try:
+        rospy.spin()
+    except KeyboardInterrupt:
+        rospy.loginfo('%s stopped' % rospy.get_name())
+
+
+if __name__ == '__main__':
+    main()
