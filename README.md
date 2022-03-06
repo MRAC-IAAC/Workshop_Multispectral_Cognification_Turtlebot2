@@ -1,11 +1,14 @@
 # MRAC Multispectral Cognification workshop
 
 ## Hardware
-- Turtlebot 2  
+- Turtlebot 2 
+- Holybro X500
+- Pixhawx PX4 flight controller
 - Slamtec A2M8 lidar   
 - Orbecc Astra  
-- Flir Lepton 3.5  
-- Pure Thermal2 board  
+- Realsense D435i
+- Flir Lepton 3.5 + Pure Thermal 2 board
+- Vive tracker
 
 
 ## ROS install
@@ -20,7 +23,7 @@ install all dependencies
 sudo apt install libuvc-dev ros-noetic-rgbd-launch ros-noetic-joy ros-noetic-openni2-launch ros-noetic-gmapping ros-noetic-gmapping ros-noetic-slam-gmapping ros-noetic-move-base ros-noetic-amcl ros-noetic-navigation v4l-util
 ```
 - create a catkin workspace  
-- clone this repo to the source folder
+- clone this repo to the source folder or just clone pkg's you require
 
 ```shell
 rosdep install --from-paths src --ignore-src -r -y
@@ -76,7 +79,7 @@ roslaunch realsense2_camera rs_camera.launch clip_distance:=2
 See GitHub page for more launch parameters
 
 ### Lepton PureThermal
-install dependencies
+####install dependencies
 ```shell
 sudo apt install v4l-utils
 ```
@@ -98,6 +101,11 @@ Video Capture 255 (usb-0000:00:14.0-1):
 	/dev/video1
 	/dev/media0
 ```
+####usage
+read the comments in the script
+```shell
+rosrun lepton_pt_capture capture.py
+```
 
 ### laser_assembler
 usage astra turtlebot
@@ -111,3 +119,29 @@ usage realsense
 roslaunch laser_assembler ptcl2thermal_assembler.launch
 rosrun laser_assembler ptcl2_assembler
 ```
+
+### depth_image_proc (used for generating thermal pointcloud)
+
+http://wiki.ros.org/depth_image_proc  
+see 2.3 depth_image_proc/point_cloud_xyz
+usage
+- launch depth camera (astra or realsense)
+- rosrun lepton_pt_capture node
+
+```shell
+roslaunch depth_image_proc point_cloud_xyzrgb_astra.launch 
+roslaunch depth_image_proc point_cloud_xyzrgb_realsense.launch 
+```
+
+
+###ROS Bag
+
+usefull resources below
+
+http://wiki.ros.org/rosbag  
+http://wiki.ros.org/rosbag/Code%20API#Python_API
+http://wiki.ros.org/rosbag/Cookbook
+
+### rtabmap_ros
+http://wiki.ros.org/rtabmap_ros
+

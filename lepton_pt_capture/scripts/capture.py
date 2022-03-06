@@ -29,6 +29,7 @@ class Capture:
     def init_ir_cap():
         # use V4l2 pipe otherwise CV2 returns 8bit image
         cap_ir = cv2.VideoCapture(index_ir_cam, cv2.CAP_V4L2)
+        # camera can capture in 2 different formats with openCV Y16 (raw sensor values) and BGR3 (colorized by frame)
         # raw format
         # cap_ir.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y', '1', '6', ' '))
         # colored format
@@ -54,25 +55,31 @@ class Capture:
         while True:
             # Capture frame-by-frame
             code, frame = self.ir_cap.read()
-            # if frame is read correctly ret is True
+            # If frame is read correctly ret is True
             if not code:
                 rospy.loginfo("Can't receive frame (stream end?). Exiting ...")
                 break
 
+            # Operations on frames go here
+            # Resize image it matches the size of depth cameras
             frame = cv2.resize(frame[:, :], (640, 480))
-
-            # uncomment the line below if you are capturing raw but want to send a visible image(usefull for debugging)
+            # For turtlebot frame should rotate 180
+            frame = cv2.rotate(frame, cv2.ROTATE_180)
+            # Uncomment the line below if you are capturing raw but want to send a visible image(usefull for debugging)
             # frame = Capture.raw_to_8bit(frame)
 
             try:
-                # use for color or grayscale
+                # Use for color or grayscale 8bit
                 i_msg = self.bridge.cv2_to_imgmsg(frame,'bgr8')
 
-                # use for raw 16 bit format
+                # Use for raw 16 bit format
                 # msg self.bridge.cv2_to_imgmsg(frame, 'mono16')
 
                 i_msg.header.stamp = rospy.rostime.Time.now()
-                i_msg.header.frame_id = 'camera_depth_optical_frame'
+                # Frame for realsense
+                # i_msg.header.frame_id = 'camera_depth_optical_frame'
+                # Frame for astra
+                i_msg.header.frame_id = 'camera_rgb_optical_frame'
                 self.img_pub.publish(i_msg)
 
             except CvBridgeError as e:
