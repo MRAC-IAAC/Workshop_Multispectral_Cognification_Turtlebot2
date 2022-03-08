@@ -10,7 +10,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
 # run v4l2-ctl --list-devices to determine index
-index_ir_cam = 0
+index_ir_cam = 2
 
 
 class Capture:
@@ -73,7 +73,7 @@ class Capture:
                 i_msg = self.bridge.cv2_to_imgmsg(frame,'bgr8')
 
                 # Use for raw 16 bit format
-                # msg self.bridge.cv2_to_imgmsg(frame, 'mono16')
+                # i_msg = self.bridge.cv2_to_imgmsg(frame, 'mono16')
 
                 i_msg.header.stamp = rospy.rostime.Time.now()
                 # Frame for realsense

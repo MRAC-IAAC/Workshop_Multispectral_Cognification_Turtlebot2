@@ -6,7 +6,7 @@ import cv2
 from datetime import datetime
 import numpy as np
 
-path = '/home/mate/sensor_data'
+ir_camera_index = 2
 
 
 def raw_to_8bit(data):
@@ -17,7 +17,7 @@ def raw_to_8bit(data):
 
 def main():
     # use V4l2 pipe otherwise CV2 returns 8bit image
-    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+    cap = cv2.VideoCapture(ir_camera_index , cv2.CAP_V4L2)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y', '1', '6', ' '))
     # cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('B', 'G', 'R', '3'))
     cap.set(cv2.CAP_PROP_CONVERT_RGB, 0)

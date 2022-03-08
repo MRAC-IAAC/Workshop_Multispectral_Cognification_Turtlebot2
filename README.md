@@ -139,7 +139,7 @@ roslaunch depth_image_proc point_cloud_xyzrgb_realsense.launch
 usefull resources below
 
 http://wiki.ros.org/rosbag  
-http://wiki.ros.org/rosbag/Code%20API#Python_API
+http://wiki.ros.org/rosbag/Code%20API#Python_API  
 http://wiki.ros.org/rosbag/Cookbook
 
 ### rtabmap_ros
