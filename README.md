@@ -134,7 +134,7 @@ roslaunch depth_image_proc point_cloud_xyzrgb_realsense.launch
 ```
 
 
-###ROS Bag
+### ROS Bag
 
 usefull resources below
 
