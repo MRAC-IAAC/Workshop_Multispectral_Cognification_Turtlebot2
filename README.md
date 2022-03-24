@@ -79,7 +79,7 @@ roslaunch realsense2_camera rs_camera.launch clip_distance:=2
 See GitHub page for more launch parameters
 
 ### Lepton PureThermal
-####install dependencies
+#### install dependencies
 ```shell
 sudo apt install v4l-utils
 ```
@@ -101,7 +101,7 @@ Video Capture 255 (usb-0000:00:14.0-1):
 	/dev/video1
 	/dev/media0
 ```
-####usage
+#### usage  
 read the comments in the script
 ```shell
 rosrun lepton_pt_capture capture.py
